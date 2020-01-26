@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "name": "gql-bkk-8-demo",
+  "builds": [{
+    "src": "/src/index.ts",
+    "use": "@now/node"
+  }],
+  "routes": [{
+    "src": "/(.*)",
+    "dest": "/src/index.ts"
+  }],
+  "regions": ["all"]
+}
