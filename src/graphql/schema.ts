@@ -1,45 +1,12 @@
-import { gql } from 'apollo-server-express'
+import 'graphql-import-node'
+import * as typeDefs from './schema.gql'
 
-export const schema = gql`
-  type Query {
-    anime(id: Int!): Anime!
-    mangas(id: Int!): [Manga!]!
-  }
+import { GraphQLSchema } from 'graphql'
+import { makeExecutableSchema } from 'graphql-tools'
 
-  interface Publication {
-    id: Int!
-    name: LocaleText
-  }
+import { resolvers } from './resolvers'
 
-  interface LocaleText {
-    english: String!
-    japanese: String!
-    romaji: String!
-  }
-
-  type Anime implements Publication {
-    id: Int!
-    name: LocaleText
-    studios: [Studios!]!
-    genres: [String!]!
-  }
-
-  type Manga implements Publication {
-    id: Int!
-    name: LocaleText
-    publisher: Publisher!
-    genres: [String!]!
-  }
-
-  type Studios {
-    id: Int!
-    name: String!
-    works: [Int!]!
-  }
-
-  type Publisher {
-    id: Int!
-    name: String!
-    works: [Manga!]!
-  }
-`
+export const schema: GraphQLSchema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+})

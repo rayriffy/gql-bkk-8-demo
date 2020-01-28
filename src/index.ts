@@ -8,8 +8,7 @@ import cors from 'cors'
 import express from 'express'
 
 /* Apollo config */
-import { resolvers } from './graphql/resolvers'
-import { schema as typeDefs } from './graphql/schema'
+import { schema } from './graphql/schema'
 
 import { AniListAPI } from './graphql/data/anilist'
 
@@ -22,8 +21,7 @@ const API = new AniListAPI() as DataSources<{}>
  * Summon Apollo GraphQL
  */
 const apollo = new ApolloServer({
-  typeDefs,
-  resolvers,
+  schema,
   dataSources: () => ({
     AniListAPI: API,
   }),

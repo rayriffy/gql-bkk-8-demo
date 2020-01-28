@@ -1,0 +1,32 @@
+type Query {
+  getMedia(id: Int!): Media!
+  getStudio(id: Int!): Studio!
+}
+
+enum PUBLISH_TYPE {
+  ANIME
+  MANGA
+}
+
+type LocaleText {
+  romaji: String!
+  english: String!
+  native: String!
+}
+
+type Media {
+  id: ID!
+  title: LocaleText
+  type: PUBLISH_TYPE
+  studios: [Studio!]!
+  genres: [String!]!
+}
+
+type Studio {
+  id: Int!
+  name: String!
+  isAnimationStudio: Boolean!
+  siteUrl: String
+  works: [Media!]!
+}
+

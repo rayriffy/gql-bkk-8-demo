@@ -1,35 +1,72 @@
   
 // import _ from 'lodash'
 
-import { IResolvers, IFieldResolver } from 'apollo-server-express'
+import { IResolvers } from 'graphql-tools'
 
-import { IGetAnimeResponse } from './data/anilist'
+import { IMedia, IStudio } from './data/anilist'
 
-const anime: IFieldResolver<undefined, any, {id: number}> = async(_source, args, context) => {
-  const {id} = args
-
-  const raw = await context.dataSources.AniListAPI.getAnime(id) as IGetAnimeResponse
-
-  return {
-    id: raw.id,
-    name: {
-      romaji: raw.title.romaji,
-      english: raw.title.english,
-      japanese: raw.title.native,
-    },
-    studios: raw.studios.nodes.map(o => {
-      console.log(o)
-      return {
-        id: o.id,
-        name: o.name,
-        works: o.media.edges.map(o => o.id),
-      }
-    }),
-  }
-}
+import { schema } from './schema'
 
 export const resolvers: IResolvers = {
   Query: {
-		anime,
+    getMedia: async(_source, args, context, info) => {
+      const {id} = args
+    
+      const raw = await context.dataSources.AniListAPI.getMedia(id) as IMedia
+    
+      return {
+        ...raw,
+        studios: raw.studios.nodes.map(o => ({
+          id: o.id
+        })),
+      }
+    },
+    getStudio: async(_source, args, context, info) => {
+      const {id} = args
+    
+      const raw = await context.dataSources.AniListAPI.getStudio(id) as IStudio
+    
+      return {
+        ...raw,
+        works: raw.media.nodes.map(o => ({
+          id: o.id,
+          type: o.type,
+        })),
+      }
+    },
+  },
+  Media: {
+    studios: async(source, args, context, info) => {
+      console.log('studioMerge:source >>', source)
+      console.log('studioMerge:info >>', info)
+    
+      return info.mergeInfo.delegateToSchema({
+        schema,
+        operation: 'query',
+        fieldName: 'getStudio',
+        args: {
+          id: source.id,
+        },
+        context,
+        info,
+      })
+    },
+  },
+  Studio: {
+    works: async(source, args, context, info) => {
+      console.log('mediaMerge:source >>', source)
+      console.log('mediaMerge:info >>', info)
+    
+      return info.mergeInfo.delegateToSchema({
+        schema,
+        operation: 'query',
+        fieldName: 'getMedia',
+        args: {
+          id: source.id,
+        },
+        context,
+        info,
+      })
+    },
   },
 }
