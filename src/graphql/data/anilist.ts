@@ -98,7 +98,7 @@ export class AniListAPI extends GraphQLDataSource {
         }
       )
 
-      return response.data.Media
+      return response.data.Studio
     } catch (err) {
       console.error(err)
     }
